@@ -1,0 +1,12 @@
+*.ptau
+*.zkey
+*.r1cs
+*.sym
+
+*.json
+!*.input.json
+
+*_cpp/
+*_js/
+
+*.wtns

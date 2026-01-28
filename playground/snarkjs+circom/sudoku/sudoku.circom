@@ -42,32 +42,68 @@ template OneToNine() {
     upperBound.in <== in + 6;
 }
 
+// Template for an (n^2) by (n^2) sudoku composed of an n-by-n grid of n-by-n boxes
+//
+// n being the square root of the size instead of the actual size is necessary to avoid
+// having to evaluate the size of the boxes in the circuit compilation
 template Sudoku(n) {
-    // solution is a 2D array: indices are (row_i, col_i)
-    signal input solution[n][n];
+    // solution is a 2D array: indices are (row, col)
+    signal input solution[n**2][n**2];
     // puzzle is the same, but a zero indicates a blank
-    signal input puzzle[n][n];
+    signal input puzzle[n**2][n**2];
 
-    component distinct[n];
-    component inRange[n][n];
+    component distinctRows[n**2];
+    component distinctColumns[n**2];
+    component distinctBoxes[n**2];
+    component inRange[n**2][n**2];
 
-    for (var row_i = 0; row_i < n; row_i++) {
-        for (var col_i = 0; col_i < n; col_i++) {
-            // we could make this a component
-            puzzle[row_i][col_i] * (puzzle[row_i][col_i] - solution[row_i][col_i]) === 0;
+	// Check that solution matches initial puzzle (where defined)
+    for (var row = 0; row < n**2; row++) {
+        for (var col = 0; col < n**2; col++) {
+            puzzle[row][col] * (puzzle[row][col] - solution[row][col]) === 0;
         }
     }
 
-    for (var row_i = 0; row_i < n; row_i++) {
-        for (var col_i = 0; col_i < n; col_i++) {
-            if (row_i == 0) {
-                distinct[col_i] = Distinct(n);
-            }
-            inRange[row_i][col_i] = OneToNine();
-            inRange[row_i][col_i].in <== solution[row_i][col_i];
-            distinct[col_i].in[row_i] <== solution[row_i][col_i];
+    // Check that solution is in range
+    for (var row = 0; row < n**2; row++) {
+        for (var col = 0; col < n**2; col++) {
+            inRange[row][col] = OneToNine();
+            inRange[row][col].in <== solution[row][col];
         }
+    }
+
+    // Check that rows are distinct
+    for (var row = 0; row < n**2; row++) {
+        distinctRows[row] = Distinct(n**2);
+        for (var col = 0; col < n**2; col++) {
+            distinctRows[row].in[col] <== solution[row][col];
+        }
+    }
+
+    // Check that columns are distinct
+    for (var col = 0; col < n**2; col++) {
+        distinctColumns[col] = Distinct(n**2);
+        for (var row = 0; row < n**2; row++) {
+            distinctColumns[col].in[row] <== solution[row][col];
+        }
+    }
+
+    // Check that boxes are distinct
+    for (var box_row = 0; box_row < n; box_row++) {
+		for (var box_col = 0; box_col < n; box_col++) {
+			var box = box_row + box_col * n;
+			distinctBoxes[box] = Distinct(n**2);
+
+			for (var cell_row = 0; cell_row < n; cell_row++) {
+				for(var cell_col = 0; cell_col < n; cell_col++) {
+					var index = cell_row + cell_col * n;
+					var global_row = cell_row + box_row * n;
+					var global_col = cell_col + box_col * n;
+					distinctBoxes[box].in[index] <== solution[global_row][global_col];
+				}
+			}
+		}
     }
 }
 
-component main {public[puzzle]} = Sudoku(9);
+component main {public[puzzle]} = Sudoku(3);
