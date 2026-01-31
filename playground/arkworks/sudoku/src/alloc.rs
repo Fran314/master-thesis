@@ -1,7 +1,10 @@
 use std::borrow::Borrow;
 
 use ark_ff::PrimeField;
-use ark_r1cs_std::{prelude::{AllocVar, AllocationMode}, uint8::UInt8};
+use ark_r1cs_std::{
+    prelude::{AllocVar, AllocationMode},
+    uint8::UInt8,
+};
 use ark_relations::r1cs::{Namespace, SynthesisError};
 
 use crate::{Puzzle, Solution};
@@ -23,7 +26,7 @@ impl<const N: usize, F: PrimeField> AllocVar<[[u8; N]; N], F> for Puzzle<N, F> {
         }
         Ok(puzzle)
     }
-} 
+}
 
 impl<const N: usize, F: PrimeField> AllocVar<[[u8; N]; N], F> for Solution<N, F> {
     fn new_variable<T: Borrow<[[u8; N]; N]>>(
@@ -43,3 +46,4 @@ impl<const N: usize, F: PrimeField> AllocVar<[[u8; N]; N], F> for Solution<N, F>
         Ok(solution)
     }
 }
+
