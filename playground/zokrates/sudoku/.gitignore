@@ -1,0 +1,7 @@
+*.json
+!*.input.json
+
+out*
+*.key
+*.sol
+witness
