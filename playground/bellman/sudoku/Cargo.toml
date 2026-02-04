@@ -1,0 +1,11 @@
+[package]
+description = "ZKP for sudoku implemented in bellman zk-SNARK library"
+name = "sudoku-example"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bellman = "0.14.0"
+ff = "0.13.0"
+bls12_381_plus = "0.8.0"
+rand = "0.8.0"
