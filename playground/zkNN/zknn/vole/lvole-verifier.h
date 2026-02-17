@@ -1,0 +1,5 @@
+#include "zknn/vole/cope-verifier.h"
+#include "zknn/vole/base-vole-verifier.h"
+#include "zknn/vole/sps-vole-verifier.h"
+#include "zknn/vole/vole-verifier.h"
+#include "zknn/vole/vole-triple-verifier.h"
