@@ -2,17 +2,21 @@
 
 set -e
 
-# -DCMAKE_POLICY_VERSION_MINIMUM=3.5 overrides the minimum version required for cmake, otherwise it complains
-# -DWITH_PROCPS=OFF disables some memory profiling part. It's necessary because it requires `libprocps` but on NixOS only `libprocp2` is available
-# cmake -B build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWITH_PROCPS=OFF
-#
-# make -C build -j"$(nproc)"
+if [[ ! -f "./two_square.bin" ]]; then
+    # -DCMAKE_POLICY_VERSION_MINIMUM=3.5 overrides the minimum version required for cmake, otherwise it complains
+    # -DWITH_PROCPS=OFF disables some memory profiling part. It's necessary because it requires `libprocps` but on NixOS only `libprocp2` is available
+    cmake -B build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DWITH_PROCPS=OFF
 
-# # 4. Generate precomputation table (takes ~5 minutes, creates two_square.bin)
-# ./build/bin/test_three_square
-#
-# # 5. Extract model data for CNN tests
-# tar -vxjf ./model/data.tar.bz2 -C ./model
+    make -C build -j"$(nproc)"
+
+    # 4. Generate precomputation table (takes ~5 minutes, creates two_square.bin)
+    ./build/bin/test_three_square
+fi
+
+if [ ! -d "./model" ] || [ -z "$(ls -A "./model")" ]; then
+    # 5. Extract model data for CNN tests
+    tar -vxjf ./model/data.tar.bz2 -C ./model
+fi
 
 # 6. Run tests
 ./run ./build/bin/test_range # Range proof (quick, no model data needed)
